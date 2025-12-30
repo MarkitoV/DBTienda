@@ -1,0 +1,41 @@
+### Variables
+@baseUrl = http://localhost:3000/api
+@productoId = 658f1a2b3c4d5e6f7a8b9c0d
+
+### Obtener todos los productos
+GET {{baseUrl}}/productos
+Content-Type: application/json
+
+### Crear un nuevo producto
+# Solo enviamos los campos básicos, el resto se autocalcula
+POST {{baseUrl}}/productos
+Content-Type: application/json
+
+{
+  "fechaCompra": "2024-02-17T00:00:00Z",
+  "nombre": "Salsero",
+  "tipo": "Helado",
+  "distribuidor": "Delizia",
+  "cantidad": 1,
+  "precioTotal": 66.00,
+  "unidadesPorPaquete": 66,
+  "precioVenta": 1.50
+}
+
+### Obtener un producto por ID
+GET {{baseUrl}}/productos/{{productoId}}
+Content-Type: application/json
+
+### Actualizar un producto
+# Al actualizar, el pre-save hook recalculará las ganancias y totales
+PUT {{baseUrl}}/productos/{{productoId}}
+Content-Type: application/json
+
+{
+  "precioVenta": 2.00,
+  "cantidad": 2
+}
+
+### Eliminar un producto
+DELETE {{baseUrl}}/productos/{{productoId}}
+Content-Type: application/json

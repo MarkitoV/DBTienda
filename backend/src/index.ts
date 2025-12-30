@@ -14,10 +14,14 @@ app.use(cors());
 app.use(morgan('dev'));
 app.use(express.json());
 
+import productoRoutes from './routes/productoRoutes';
+
 // Routes
 app.get('/', (req: Request, res: Response) => {
   res.send('API de DBTienda funcionando');
 });
+
+app.use('/api/productos', productoRoutes);
 
 // MongoDB Connection
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/dbtienda';
