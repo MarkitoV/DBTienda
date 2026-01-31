@@ -1,0 +1,96 @@
+<h2 mat-dialog-title class="dialog-title">
+  {{ isEdit ? 'Editar Producto' : 'Nueva Compra' }}
+</h2>
+
+<mat-dialog-content class="dialog-content">
+  <form [formGroup]="productoForm" class="form-container">
+
+    <div class="form-row">
+      <mat-form-field appearance="outline" floatLabel="always" subscriptSizing="dynamic">
+        <mat-label>Fecha de Compra</mat-label>
+        <input matInput [matDatepicker]="picker" formControlName="fechaCompra" placeholder="dd/mm/aa"
+          (dateChange)="nombreInput.focus()">
+        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-datepicker #picker (closed)="nombreInput.focus()"></mat-datepicker>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" floatLabel="always" subscriptSizing="dynamic">
+        <mat-label>Nombre del Producto</mat-label>
+        <input matInput formControlName="nombre" placeholder="Ej. Pepsi 3L" [matAutocomplete]="autoNombre" #nombreInput
+          (keyup.enter)="tipoInput.focus()" (focus)="$any($event.target).select()"
+          (blur)="checkAutofill(productoForm.get('nombre')?.value)">
+        <mat-autocomplete #autoNombre="matAutocomplete"
+          (optionSelected)="checkAutofill($event.option.value); tipoInput.focus()">
+          <mat-option *ngFor="let option of filteredNombres | async" [value]="option">
+            {{option}}
+          </mat-option>
+        </mat-autocomplete>
+      </mat-form-field>
+    </div>
+
+    <div class="form-row">
+      <mat-form-field appearance="outline" floatLabel="always" subscriptSizing="dynamic">
+        <mat-label>Tipo</mat-label>
+        <input matInput formControlName="tipo" placeholder="Ej. Refresco" #tipoInput [matAutocomplete]="autoTipo"
+          (keyup.enter)="distribuidorInput.focus()" (focus)="$any($event.target).select()">
+        <mat-autocomplete #autoTipo="matAutocomplete" (optionSelected)="distribuidorInput.focus()">
+          <mat-option *ngFor="let option of filteredTipos | async" [value]="option">
+            {{option}}
+          </mat-option>
+        </mat-autocomplete>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" floatLabel="always" subscriptSizing="dynamic">
+        <mat-label>Distribuidor</mat-label>
+        <input matInput formControlName="distribuidor" placeholder="Ej. Paceña" #distribuidorInput
+          [matAutocomplete]="autoDist" (keyup.enter)="cantidadInput.focus()" (focus)="$any($event.target).select()">
+        <mat-autocomplete #autoDist="matAutocomplete" (optionSelected)="cantidadInput.focus()">
+          <mat-option *ngFor="let option of filteredDistribuidores | async" [value]="option">
+            {{option}}
+          </mat-option>
+        </mat-autocomplete>
+      </mat-form-field>
+    </div>
+
+    <div class="form-row">
+      <mat-form-field appearance="outline" floatLabel="always" subscriptSizing="dynamic">
+        <mat-label>Cantidad (Paquetes/Cajas)</mat-label>
+        <input matInput type="number" formControlName="cantidad" #cantidadInput (keyup.enter)="precioTotalInput.focus()"
+          (focus)="$any($event.target).select()">
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" floatLabel="always" subscriptSizing="dynamic">
+        <mat-label>Precio Total Pagado</mat-label>
+        <input matInput type="number" formControlName="precioTotal" prefix="BOB " #precioTotalInput
+          (keyup.enter)="unidadesPorPaqueteInput.focus()" (focus)="$any($event.target).select()">
+      </mat-form-field>
+    </div>
+
+    <div class="form-row">
+      <mat-form-field appearance="outline" floatLabel="always" subscriptSizing="dynamic">
+        <mat-label>Unidades por Paquete</mat-label>
+        <input matInput type="number" formControlName="unidadesPorPaquete" #unidadesPorPaqueteInput
+          (keyup.enter)="precioVentaInput.focus()" (focus)="$any($event.target).select()">
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" floatLabel="always" subscriptSizing="dynamic">
+        <mat-label>Precio de Venta (por Unidad)</mat-label>
+        <input matInput type="number" formControlName="precioVenta" #precioVentaInput (keyup.enter)="onSubmit()"
+          (focus)="$any($event.target).select()">
+      </mat-form-field>
+    </div>
+
+    <div class="info-note">
+      <mat-icon>info</mat-icon>
+      <span>Los totales y ganancias se calcularán automáticamente al guardar.</span>
+    </div>
+
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end" class="dialog-actions">
+  <button mat-button (click)="onCancel()">Cancelar</button>
+  <button mat-raised-button color="primary" [disabled]="!productoForm.valid" (click)="onSubmit()">
+    {{ isEdit ? 'Actualizar' : 'Guardar' }}
+  </button>
+</mat-dialog-actions>

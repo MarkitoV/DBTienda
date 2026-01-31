@@ -1,0 +1,225 @@
+<mat-toolbar color="primary" class="elegant-toolbar">
+  <span>DBTienda - Dashboard de Inventario</span>
+  <span class="spacer"></span>
+</mat-toolbar>
+
+<div class="dashboard-container">
+  <!-- Summary Cards -->
+  <div class="summary-cards">
+    <mat-card class="summary-card investment">
+      <mat-card-header>
+        <mat-card-title>Inversión Total</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="summary-value">{{ totalInversion | currency:'BOB ':'symbol':'1.2-2' }}</div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="summary-card profit">
+      <mat-card-header>
+        <mat-card-title>Ganancia Estimada</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="summary-value">{{ totalGananciaEstimada | currency:'BOB ':'symbol':'1.2-2' }}</div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="summary-card count">
+      <mat-card-header>
+        <mat-card-title>Total Compras</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="summary-value">{{ totalProductos }}</div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- Filters Section -->
+  <mat-card class="filter-card">
+    <mat-card-content>
+      <div class="filter-container">
+        <mat-form-field appearance="outline" class="filter-field">
+          <mat-label>Nombre</mat-label>
+          <input matInput [(ngModel)]="filterValues.nombre" (input)="onNombreChange()" [matAutocomplete]="autoNombre"
+            placeholder="Buscar por nombre...">
+          <mat-autocomplete #autoNombre="matAutocomplete" (optionSelected)="onNombreChange()">
+            <mat-option *ngFor="let option of filteredNombres | async" [value]="option">
+              {{option}}
+            </mat-option>
+          </mat-autocomplete>
+          <mat-icon matSuffix>search</mat-icon>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="filter-field">
+          <mat-label>Tipo</mat-label>
+          <mat-select [(ngModel)]="filterValues.tipo" (selectionChange)="applyFilter()">
+            <mat-option value="">Todos</mat-option>
+            <mat-option *ngFor="let tipo of tipos" [value]="tipo">{{tipo}}</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="filter-field">
+          <mat-label>Distribuidor</mat-label>
+          <mat-select [(ngModel)]="filterValues.distribuidor" (selectionChange)="applyFilter()">
+            <mat-option value="">Todos</mat-option>
+            <mat-option *ngFor="let dist of distribuidores" [value]="dist">{{dist}}</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="filter-field">
+          <mat-label>Desde</mat-label>
+          <input matInput [matDatepicker]="pickerStart" [(ngModel)]="filterValues.fechaInicio"
+            (dateChange)="applyFilter()">
+          <mat-datepicker-toggle matSuffix [for]="pickerStart"></mat-datepicker-toggle>
+          <mat-datepicker #pickerStart></mat-datepicker>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="filter-field">
+          <mat-label>Hasta</mat-label>
+          <input matInput [matDatepicker]="pickerEnd" [(ngModel)]="filterValues.fechaFin" (dateChange)="applyFilter()">
+          <mat-datepicker-toggle matSuffix [for]="pickerEnd"></mat-datepicker-toggle>
+          <mat-datepicker #pickerEnd></mat-datepicker>
+        </mat-form-field>
+
+        <button mat-button color="warn" (click)="clearFilters()" class="clear-btn">
+          <mat-icon>filter_alt_off</mat-icon> Limpiar
+        </button>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Subtotals Section -->
+  <div class="subtotals-container" *ngIf="isFiltered">
+    <div class="subtotal-item">
+      <span class="subtotal-label">Inversión Filtrada:</span>
+      <span class="subtotal-value">{{ subtotalInversion | currency:'BOB ':'symbol':'1.2-2' }}</span>
+    </div>
+    <div class="subtotal-item">
+      <span class="subtotal-label">Ganancia Filtrada:</span>
+      <span class="subtotal-value">{{ subtotalGanancia | currency:'BOB ':'symbol':'1.2-2' }}</span>
+    </div>
+    <div class="subtotal-item">
+      <span class="subtotal-label">Registros:</span>
+      <span class="subtotal-value">{{ subtotalCount }}</span>
+    </div>
+  </div>
+
+  <!-- Price Evolution Chart -->
+  <mat-card class="chart-card" *ngIf="subtotalCount > 0">
+    <mat-card-content>
+      <div id="chart">
+        <apx-chart [series]="chartOptions.series!" [chart]="chartOptions.chart!" [xaxis]="chartOptions.xaxis!"
+          [yaxis]="chartOptions.yaxis!" [markers]="chartOptions.markers!" [dataLabels]="chartOptions.dataLabels!"
+          [grid]="chartOptions.grid!" [stroke]="chartOptions.stroke!" [title]="chartOptions.title!"
+          [tooltip]="chartOptions.tooltip!" [theme]="chartOptions.theme!"></apx-chart>
+
+        <div class="brush-container">
+          <apx-chart [series]="brushOptions.series!" [chart]="brushOptions.chart!" [xaxis]="brushOptions.xaxis!"
+            [yaxis]="brushOptions.yaxis!" [colors]="brushOptions.colors!" [stroke]="brushOptions.stroke!"
+            [theme]="brushOptions.theme!"></apx-chart>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Products Table -->
+  <mat-card class="table-card">
+    <mat-card-content>
+      <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
+
+        <!-- Fecha Column -->
+        <ng-container matColumnDef="fechaCompra">
+          <th mat-header-cell *matHeaderCellDef> Fecha </th>
+          <td mat-cell *matCellDef="let p"> {{ p.fechaCompra | date:'dd/MM/yy' }} </td>
+        </ng-container>
+
+        <!-- Nombre Column -->
+        <ng-container matColumnDef="nombre">
+          <th mat-header-cell *matHeaderCellDef> Nombre </th>
+          <td mat-cell *matCellDef="let p"> {{ p.nombre }} </td>
+        </ng-container>
+
+        <!-- Tipo Column -->
+        <ng-container matColumnDef="tipo">
+          <th mat-header-cell *matHeaderCellDef> Tipo </th>
+          <td mat-cell *matCellDef="let p"> {{ p.tipo }} </td>
+        </ng-container>
+
+        <!-- Distribuidor Column -->
+        <ng-container matColumnDef="distribuidor">
+          <th mat-header-cell *matHeaderCellDef> Distribuidor </th>
+          <td mat-cell *matCellDef="let p"> {{ p.distribuidor }} </td>
+        </ng-container>
+
+        <!-- Cantidad Column -->
+        <ng-container matColumnDef="cantidad">
+          <th mat-header-cell *matHeaderCellDef> Cant. </th>
+          <td mat-cell *matCellDef="let p"> {{ p.cantidad }} </td>
+        </ng-container>
+
+        <!-- Unidades por Paquete Column -->
+        <ng-container matColumnDef="unidadesPorPaquete">
+          <th mat-header-cell *matHeaderCellDef> U. x Paq. </th>
+          <td mat-cell *matCellDef="let p"> {{ p.unidadesPorPaquete }} </td>
+        </ng-container>
+
+        <!-- Precio Unidad Column -->
+        <ng-container matColumnDef="precioPorUnidad">
+          <th mat-header-cell *matHeaderCellDef> P. Unidad </th>
+          <td mat-cell *matCellDef="let p"> {{ p.precioPorUnidad | currency:'BOB ':'symbol':'1.2-2' }} </td>
+        </ng-container>
+
+        <!-- Precio Total Column -->
+        <ng-container matColumnDef="precioTotal">
+          <th mat-header-cell *matHeaderCellDef> P. Total </th>
+          <td mat-cell *matCellDef="let p"> {{ p.precioTotal | currency:'BOB ':'symbol':'1.2-2' }} </td>
+        </ng-container>
+
+        <!-- Precio Venta Column -->
+        <ng-container matColumnDef="precioVenta">
+          <th mat-header-cell *matHeaderCellDef> P. Venta </th>
+          <td mat-cell *matCellDef="let p"> {{ p.precioVenta | currency:'BOB ':'symbol':'1.2-2' }} </td>
+        </ng-container>
+
+        <!-- Ganancia Column -->
+        <ng-container matColumnDef="ganancia">
+          <th mat-header-cell *matHeaderCellDef> Ganancia </th>
+          <td mat-cell *matCellDef="let p" [ngClass]="{'positive': p.ganancia > 0, 'negative': p.ganancia < 0}">
+            {{ p.ganancia | currency:'BOB ':'symbol':'1.2-2' }}
+            <small>({{ p.gananciaPorcentaje }}%)</small>
+          </td>
+        </ng-container>
+
+        <!-- Acciones Column -->
+        <ng-container matColumnDef="acciones">
+          <th mat-header-cell *matHeaderCellDef> Acciones </th>
+          <td mat-cell *matCellDef="let p">
+            <button mat-icon-button color="primary" (click)="openForm(p)" matTooltip="Editar">
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button mat-icon-button color="warn" (click)="deleteProducto(p._id)" matTooltip="Eliminar">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      </table>
+
+      <mat-paginator [pageSizeOptions]="[10, 20, 50, 100]" showFirstLastButtons class="elegant-paginator">
+      </mat-paginator>
+
+      <div *ngIf="dataSource.data.length === 0" class="no-data">
+        No hay productos registrados.
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Floating Action Button -->
+  <div class="fab-container">
+    <button mat-fab class="fab-button" (click)="openForm()" matTooltip="Nueva Compra">
+      <mat-icon>add</mat-icon>
+    </button>
+  </div>
+</div>

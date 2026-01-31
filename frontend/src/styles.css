@@ -1,0 +1,116 @@
+@import "@angular/material/prebuilt-themes/indigo-pink.css";
+
+:root {
+  --bg-color: #0F1216;
+  --surface-color: #161B22;
+  --hover-color: #1E2630;
+  --text-primary: #E6EAF0;
+  --text-secondary: #B8C0CC;
+  --text-muted: #8A94A6;
+  --primary-color: #5B7CFA;
+  --success-color: #7BC8A4;
+  --warning-color: #F2C97D;
+  --danger-color: #E57373;
+  --border-color: rgba(255, 255, 255, 0.06);
+  --shadow-soft: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-primary);
+}
+
+.dark-theme {
+  background-color: var(--bg-color);
+  color: var(--text-primary);
+}
+
+.mat-typography {
+  color: var(--text-primary) !important;
+}
+
+/* Force white text for Material components that might default to black */
+.mat-mdc-card-title,
+.mat-mdc-card-content,
+.mat-mdc-table,
+.mat-mdc-header-cell,
+.mat-mdc-cell,
+.mat-mdc-button,
+.mat-mdc-icon-button {
+  color: var(--text-primary) !important;
+}
+
+.mat-mdc-header-cell {
+  color: var(--text-primary) !important;
+  font-weight: 500 !important;
+}
+
+/* --- Dark Theme for Overlays (Select & Datepicker) --- */
+
+/* Select Panel */
+.mat-mdc-select-panel {
+  background-color: var(--surface-color) !important;
+  border: 1px solid var(--border-color) !important;
+}
+
+.mat-mdc-option {
+  color: var(--text-primary) !important;
+}
+
+.mat-mdc-option:hover:not(.mdc-list-item--disabled),
+.mat-mdc-option.mat-mdc-option-active,
+.mat-mdc-option.mdc-list-item--selected:not(.mdc-list-item--disabled) {
+  background-color: var(--hover-color) !important;
+}
+
+.mat-mdc-option .mdc-list-item__primary-text {
+  color: var(--text-primary) !important;
+}
+
+/* Datepicker / Calendar */
+.mat-datepicker-content {
+  background-color: var(--surface-color) !important;
+  color: var(--text-primary) !important;
+  border: 1px solid var(--border-color) !important;
+  box-shadow: var(--shadow-soft) !important;
+}
+
+.mat-calendar {
+  background-color: var(--surface-color) !important;
+}
+
+.mat-calendar-body-label,
+.mat-calendar-period-button,
+.mat-calendar-table-header,
+.mat-calendar-table-header th,
+.mat-calendar-body-cell-content {
+  color: var(--text-primary) !important;
+}
+
+.mat-calendar-next-button,
+.mat-calendar-previous-button {
+  color: var(--text-primary) !important;
+}
+
+.mat-calendar-body-selected {
+  background-color: var(--primary-color) !important;
+  color: white !important;
+}
+
+.mat-calendar-body-today:not(.mat-calendar-body-selected):not(.mat-calendar-body-comparison-identical) {
+  border-color: var(--primary-color) !important;
+}
+
+.mat-calendar-body-cell:not(.mat-calendar-body-disabled):hover>.mat-calendar-body-cell-content:not(.mat-calendar-body-selected):not(.mat-calendar-body-comparison-identical) {
+  background-color: var(--hover-color) !important;
+}
+
+/* Autocomplete Panel */
+.mat-mdc-autocomplete-panel {
+  background-color: var(--surface-color) !important;
+  border: 1px solid var(--border-color) !important;
+}
